@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Semana 1 | Sistemas Gráficos</title>
+        <style>
+            body {
+                background-color: grey;
+                font-family: Arial, Helvetica, sans-serif;
+            }
+
+            canvas {
+                background-color: white;
+            }
+
+            textarea {
+                background-color: white;
+            }
+
+            #titulo {
+                text-align: center;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="titulo">
+            <h1>Sistemas gráficos</h1>
+            <h2>WebGL Ejemplo 01 - Canvas y WebGL context</h2>
+            <canvas id="my-canvas" width="900" height="500">
+                Tu navegador no soporta el elemento HTML5 canvas
+            </canvas>
+        </div>
+        <script>
+            function initWebGL() {
+                canvas = document.getElementById('my-canvas');
+
+                try {
+                    gl = canvas.getContext('webgl');
+                } catch (e) {
+                    alert('Error al obtener el contexto');
+                }
+
+                if (gl) {
+                    gl.clearColor(0.1, 0.1, 0.5, 1.0);
+                    gl.clear(gl.COLOR_BUFFER_BIT);
+                } else {
+                    alert('Error: Su navegador no soporta WebGL');
+                }
+            }
+
+            window.onload = initWebGL;
+        </script>
+    </body>
+</html>
