@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Semana 1 | Sistemas Gráficos</title>
+        <style>
+            body {
+                background-color: grey;
+                font-family: Arial, Helvetica, sans-serif;
+            }
+
+            canvas {
+                background-color: white;
+            }
+
+            textarea {
+                background-color: white;
+            }
+
+            #titulo {
+                text-align: center;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="titulo">
+            <h1>Sistemas gráficos</h1>
+            <h2>WebGL Ejemplo 02 - Vertex Array Objects "VBOs"</h2>
+            <canvas id="my-canvas" width="900" height="500">
+                Tu navegador no soporta el elemento HTML5 canvas
+            </canvas>
+        </div>
+
+        <!-- Vertex shader (GLSL) -->
+        <script id="shader-vs" type="x-shader/x-vertex">
+            attribute vec3 aVertexPosition;
+            attribute vec3 aVertexColor;
+
+            varying highp vec4 vColor;
+            void main(void) {
+                gl_Position = vec4(aVertexPosition, 1.0);
+                vColor = vec4(aVertexColor, 1.0);
+            }
+        </script>
+
+        <!-- Fragment shader (GLSL) -->
+        <script id="shader-fs" type="x-shader/x-fragment">
+            varying highp vec4 vColor;
+            void main(void) {
+                gl_FragColor = vColor;
+            }
+        </script>
+
+        <script>
+            var gl = null,
+                canvas = null,
+                glProgram = null,
+                fragmentShader = null,
+                vertexShader = null;
+
+            var vertexPositionAttribute = null,
+                trianglesVerticeBuffer = null,
+                vertexColorAttribute = null,
+                trianglesColorBuffer = null;
+
+            function initWebGL() {
+                canvas = document.getElementById('my-canvas');
+
+                try {
+                    gl = canvas.getContext('webgl');
+                } catch (e) {
+                    alert('Error al obtener el contexto');
+                }
+
+                if (gl) {
+                    setupWebGL();
+                    initShaders();
+                    setupBuffers();
+                    drawScene();
+                } else {
+                    alert('Error: Su navegador no soporta WebGL');
+                }
+            }
+
+            function setupWebGL() {
+                gl.clearColor(0.1, 0.1, 0.2, 1.0);
+                gl.clear(gl.COLOR_BUFFER_BIT);
+
+                gl.viewport(0, 0, canvas.width, canvas.height);
+            }
+
+            function initShaders() {
+                var fs_source = document.getElementById("shader-fs").innerHTML,
+                    vs_source = document.getElementById("shader-vs").innerHTML;
+
+                // compile shaders
+                vertexShader = makeShader(vs_source, gl.VERTEX_SHADER);
+                fragmentShader = makeShader(fs_source, gl.FRAGMENT_SHADER);
+
+                // create program
+                glProgram = gl.createProgram();
+
+                // attach and link shaders to the program
+                gl.attachShader(glProgram, vertexShader);
+                gl.attachShader(glProgram, fragmentShader);
+                gl.linkProgram(glProgram);
+
+                if (!gl.getProgramParameter(glProgram, gl.LINK_STATUS)) {
+                    alert("Unable to initialize the shader program.");
+                }
+
+                // use program
+                gl.useProgram(glProgram);
+            }
+
+            function makeShader(src, type) {
+                const shader = gl.createShader(type);
+                gl.shaderSource(shader, src);
+                gl.compileShader(shader);
+
+                if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+                    alert('Error compiling shader: ' + gl.getShaderInfoLog(shader));
+                }
+
+                return shader;
+            }
+
+            function setupBuffers() {
+                var data = [
+                    -0.5, -0.5, 0.0,
+                    -0.5,  0.5, 0.0,
+                     0.0, -0.5, 0.0,
+
+                    0.0,  0.5, 0.0,
+                    0.5, -0.5, 0.0,
+                    0.5,  0.5, 0.0
+                ];
+
+                // create a new buffer in GPU memory
+                trianglesVerticeBuffer = gl.createBuffer();
+                // tell the WebGL API to use `trianglesVerticeBuffer` buffer.
+                gl.bindBuffer(gl.ARRAY_BUFFER, trianglesVerticeBuffer);
+                // send data from browser to previously selected GPU buffer
+                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
+
+                // Do the same for each color.
+                // Each vertex has an associated color. Vertex at trianglesVerticesBuffer[i] uses color
+                // at trianglesColorBuffer[i].
+                var color = [
+                    1.0, 0.0, 0.0,
+                    1.0, 1.0, 0.0,
+                    0.0, 1.0, 0.0,
+
+                    0.0, 1.0, 1.0,
+                    0.0, 0.0, 1.0,
+                    1.0, 0.0, 1.0
+                ];
+
+                trianglesColorBuffer = gl.createBuffer();
+                gl.bindBuffer(gl.ARRAY_BUFFER, trianglesColorBuffer);
+                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(color), gl.STATIC_DRAW);
+            }
+
+            function drawScene() {
+                vertexPositionAttribute = gl.getAttribLocation(glProgram, "aVertexPosition");
+                gl.enableVertexAttribArray(vertexPositionAttribute);
+                gl.bindBuffer(gl.ARRAY_BUFFER, trianglesVerticeBuffer);
+                gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
+
+                vertexColorAttribute = gl.getAttribLocation(glProgram, "aVertexColor");
+                gl.enableVertexAttribArray(vertexColorAttribute);
+                gl.bindBuffer(gl.ARRAY_BUFFER, trianglesColorBuffer);
+                gl.vertexAttribPointer(vertexColorAttribute, 3, gl.FLOAT, false, 0, 0);
+
+                gl.drawArrays(gl.TRIANGLES, 0, 6);
+            }
+
+            window.onload = initWebGL;
+        </script>
+    </body>
+</html>
