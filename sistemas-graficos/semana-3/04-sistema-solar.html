@@ -399,19 +399,20 @@
 
             *********************************************************************************
             */
+            const dt = 10 * tiempo;
 
             // tierra
             m1=mat4.create();
             me = mat4.create();
             // Rotar alrededor del sol
-            mat4.rotate(m1, m1, 2 * Math.PI * tiempo, vec3.fromValues(0, 1, 0));
+            mat4.rotate(m1, m1, 2 * Math.PI * dt/365, vec3.fromValues(0, 1, 0));
             mat4.translate(me,m1,[60,0,0]);
 
             // Inclinar 23deg respecto de Y+
             mat4.rotate(m1, me, Math.PI * 23/180, vec3.fromValues(1, 0, 0));
 
             // Rotar sobre su eje
-            mat4.rotate(m1, m1, 2 * Math.PI * tiempo, vec3.fromValues(0, 1, 0));
+            mat4.rotate(m1, m1, 2 * Math.PI * dt, vec3.fromValues(0, 1, 0));
 
             setTransform(tierra,m1);
 
@@ -428,7 +429,7 @@
             // iss
             m4=mat4.create();
             mat4.translate(m4,me,[0,0,0]);
-            mat4.rotate(m4, m4, 2 * Math.PI * tiempo, vec3.fromValues(0, 0, 1));
+            mat4.rotate(m4, m4, 2 * Math.PI * dt, vec3.fromValues(0, 0, 1));
             mat4.translate(m4, m4, [10, 0, 0]);
             setTransform(iss,m4);
 
