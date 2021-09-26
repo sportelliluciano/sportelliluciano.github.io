@@ -402,14 +402,19 @@
             const dt = 10 * tiempo;
 
             // tierra
-            m1=mat4.create();
+            m1 = mat4.create();
             me = mat4.create();
+
             // Rotar alrededor del sol
             mat4.rotate(m1, m1, 2 * Math.PI * dt/365, vec3.fromValues(0, 1, 0));
-            mat4.translate(me,m1,[60,0,0]);
+            mat4.translate(m1, m1, [90, 0, 0]);
+            me = mat4.clone(m1);
+
+            // Mantener fija respecto de la rotación alrededor del sol
+            mat4.rotate(m1, m1, -2 * Math.PI * dt/365, vec3.fromValues(0, 1, 0));
 
             // Inclinar 23deg respecto de Y+
-            mat4.rotate(m1, me, Math.PI * 23/180, vec3.fromValues(1, 0, 0));
+            mat4.rotate(m1, m1, -Math.PI * 23/180, vec3.fromValues(1, 0, 0));
 
             // Rotar sobre su eje
             mat4.rotate(m1, m1, 2 * Math.PI * dt, vec3.fromValues(0, 1, 0));
@@ -418,12 +423,13 @@
 
             // luna
             m2=mat4.create();
-            mat4.translate(m2,me,[30,0,0]);
+            mat4.rotate(m2, me, 2 * Math.PI * dt/30, vec3.fromValues(0, 1, 0));
+            mat4.translate(m2,m2,[30,0,0]);
             setTransform(luna,m2);
 
             // apollo
             m3=mat4.create();
-            mat4.translate(m3,m2,[20,0,0]);
+            mat4.translate(m3,m2,[10,0,0]);
             setTransform(apollo,m3);
 
             // iss
